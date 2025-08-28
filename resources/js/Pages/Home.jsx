@@ -43,11 +43,14 @@ export default function Home() {
   // Fungsi memilih media (gambar) untuk story
   const handleMediaChange = (e) => {
   const file = e.target.files?.[0]
-  if (file) {
-    setData('media', file)
-    setMediaPreview(URL.createObjectURL(file))
+    if (file) {
+      setData('media', file)
+      setMediaPreview(URL.createObjectURL(file))
+    } else {
+      setData('media', null)
+      setMediaPreview(null)
+    }
   }
-}
 
   // Fungsi memilih avatar profil
   const handleAvatarChange = (e) => {
@@ -63,16 +66,18 @@ export default function Home() {
   const submit = (e) => {
     e.preventDefault()
     post('/stories', {
-      forceFormData: true, // ⬅️ ini wajib untuk file upload
+      forceFormData: true, // wajib untuk file upload
       onSuccess: () => {
-        reset('story', 'avatar', 'name')
+        // reset semua field, termasuk media
+        reset('story', 'avatar', 'name', 'media')
         setAvatarPreview(null)
-        setMediaPreview(null)  
+        setMediaPreview(null)
         if (fileInputRef.current) fileInputRef.current.value = ''
         if (mediaInputRef.current) mediaInputRef.current.value = ''
       },
     })
   }
+
 
   // Fungsi like story
   const like = (id) => {
@@ -253,8 +258,12 @@ export default function Home() {
             <div key={story.id} className='flex gap-6 items-start border-b border-[#393939] pb-6'>
 
               {/* Avatar */}
-              <div className='w-12 h-12 rounded-full flex-shrink-0 overflow-hidden'>
-                <img src={story.avatar} className='rounded-full w-full h-full object-cover' alt="" />
+              <div className='w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-[#474747] flex items-center justify-center'>
+                {story.avatar ? (
+                  <img src={story.avatar} className='rounded-full w-full h-full object-cover' alt="" />
+                ) : (
+                  <FaUser className="text-xl text-gray-300" />
+                )}
               </div>
 
               {/* Nama */}
